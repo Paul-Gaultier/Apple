@@ -57,12 +57,12 @@ class SecurityController extends AbstractController
             $from = $request->request->get('email');
 
             $email = (new TemplatedEmail())
-                ->from('hello@example.com')
-                ->to('jeanmidupuis978@gmail.com')
+                ->from('$from')
+                ->to('$paul.gaultier76@yahoo.com')//l'adresse mail du projet ici
                 ->subject($motif)
                 ->text('Sending emails is fun again!')
                 ->htmlTemplate('security/template_email.html.twig');
-            $cid = $email->embedFromPath('uploads/logo.png', 'logo');
+            $cid = $email->embedFromPath('uploads/logo.jfif', 'logo');
 
             // pass variables (name => value) to the template
             $email->context([
@@ -113,13 +113,13 @@ class SecurityController extends AbstractController
             $manager->persist($user);
             $manager->flush();
 
-            $email = (new TemplatedEmail())
+            $email = (new TemplatedEmail())// Lancement d'un nouvel objet Email
                 ->from('hello@example.com')
-                ->to($request->request->get('email'))
+                ->to($request->request->get('email'))// A qui ça doit etre renvoyé
                 ->subject('Demande de réinitialisation de mot de passe')
                 ->text('Sending emails is fun again!')
                 ->htmlTemplate('security/template_email.html.twig');
-            $cid = $email->embedFromPath('uploads/logo.png', 'logo');
+            $cid = $email->embedFromPath('uploads/logo.jfif', 'logo');
 
             // pass variables (name => value) to the template
             $email->context([
@@ -129,8 +129,10 @@ class SecurityController extends AbstractController
                 'subject' => 'demande de réinitialisation',
                 'from' => 'onlyMovie@only.com',
                 'cid' => $cid,
-                'liens' => 'https://127.0.0.1:8000/resetForm?token=' . $token . '&i=' . $user->getId(),
-                'objectif' => 'Réinitialiser'
+                'liens' => 'http://127.0.0.1:8000/resetForm?token=' . $token . '&i=' . $user->getId(), //c'est à nous de définir la route et le port du serveur (navigateur ici 8000)
+                //dans le "?" tu paramètre le $_GET
+                'objectif' => 'Réinitialiser',
+                'button'=>true
 
             ]);
 
@@ -138,7 +140,7 @@ class SecurityController extends AbstractController
 
 
             $this->addFlash('success', 'Un Email vient de vous être envoyer!');
-            return $this->redirectToRoute('login');
+            return $this->redirectToRoute('app_login');
         else:
             $this->addFlash('danger', 'Aucun compte existant à cette adresse mail');
 
@@ -181,7 +183,7 @@ class SecurityController extends AbstractController
      */
     public function finalReset(UserRepository $repository, EntityManagerInterface $manager, Request $request, UserPasswordHasherInterface $hasher)
     {
-        $user = $repository->find($request->request->get('id'));
+        $user = $repository->find($request->request->get('id'));// request va recupérer toute les donnée en POST 
         if ($request->request->get('password') == $request->request->get('confirm_password')):
 
 
@@ -192,7 +194,7 @@ class SecurityController extends AbstractController
             $manager->flush();
 
             $this->addFlash('success', 'Mot de passe réinitialisé, connectez vous à présent');
-            return $this->redirectToRoute('login');
+            return $this->redirectToRoute('app_login');
 
         else:
             $this->addFlash('danger', 'Les mots de passe ne correspondent pas');

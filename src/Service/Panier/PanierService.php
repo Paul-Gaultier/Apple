@@ -15,16 +15,15 @@ class PanierService
     {
         $this->session = $session;
         $this->movieRepository = $movieRepository;
-
     }
 
     public function add(int $id)
     {
         $panier = $this->session->get('panier', []);
 
-        if (empty($panier[$id])):
+        if (empty($panier[$id])) :
             $panier[$id] = 1;
-        else:
+        else :
             $panier[$id]++;
         endif;
 
@@ -35,9 +34,9 @@ class PanierService
     {
         $panier = $this->session->get('panier', []);
 
-        if (!empty($panier[$id]) && $panier[$id] !== 1):
+        if (!empty($panier[$id]) && $panier[$id] !== 1) :
             $panier[$id]--;
-        else:
+        else :
             unset($panier[$id]);
         endif;
 
@@ -48,7 +47,7 @@ class PanierService
     {
         $panier = $this->session->get('panier', []);
 
-        if (!empty($panier[$id])):
+        if (!empty($panier[$id])) :
             unset($panier[$id]);
         endif;
 
@@ -62,18 +61,39 @@ class PanierService
 
         $panierDetail = [];
 
-        foreach ($panier as $id => $quantite):
+        foreach ($panier as $id => $quantite) :
 
-            $panierDetail[]=[
-                'product'=>$this->movieRepository->find($id),
-                'quantity'=>$quantite
+            $panierDetail[] = [
+                'product' => $this->movieRepository->find($id),
+                'quantity' => $quantite
             ];
 
         endforeach;
         return $panierDetail;
-
-
     }
 
 
+    public function getTotal()
+    {
+
+
+        $panier =  $this->getFullCart();
+
+        //    dd($panier);
+
+        $total = 0;
+
+        foreach ($panier as $item => $value) :
+
+            // dd($item, $value);
+
+            // dd($value['product']);
+
+            $total += $value['product']->getPrice() * $value['quantity'];
+
+        endforeach;
+
+        // dd($total);
+        return $total;
+    }
 }
